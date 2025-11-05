@@ -1,0 +1,6 @@
+Django==5.2.6
+celery==5.5.3
+redis==7.0.1
+mysqlclient==2.2.7
+geopy==2.4.1
+Pillow==10.3.0

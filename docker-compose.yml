@@ -1,0 +1,77 @@
+version: '3.9'
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: mysql_db
+    restart: always
+    environment:
+      MYSQL_DATABASE: chalosaathi_db
+      MYSQL_USER: django_user
+      MYSQL_PASSWORD: MyStrongPass123
+      MYSQL_ROOT_PASSWORD: rootpass
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-prootpass"]
+      interval: 5s
+      timeout: 10s
+      retries: 10
+
+  redis:
+    image: redis:7
+    container_name: redis_broker
+    restart: always
+    ports:
+      - "6379:6379"
+
+  web:
+    build: .
+    container_name: django_app
+    # 👇 Wait for MySQL before starting Django
+    command: >
+      sh -c "./wait_for_db.sh &&
+             python manage.py migrate &&
+             python manage.py collectstatic --noinput &&
+             python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    environment:
+      - DB_HOST=db
+      - DB_NAME=chalosaathi_db
+      - DB_USER=django_user
+      - DB_PASS=MyStrongPass123
+      - REDIS_URL=redis://redis:6379/0
+
+  celery:
+    build: .
+    container_name: celery_worker
+    # 👇 Worker will start after MySQL + Redis are ready
+    command: >
+      sh -c "./wait_for_db.sh &&
+             celery -A chalosaathi worker -l info"
+    volumes:
+      - .:/app
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    environment:
+      - DB_HOST=db
+      - DB_NAME=chalosaathi_db
+      - DB_USER=django_user
+      - DB_PASS=MyStrongPass123
+      - REDIS_URL=redis://redis:6379/0
+
+volumes:
+  mysql_data:

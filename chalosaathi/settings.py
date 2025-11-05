@@ -77,10 +77,10 @@ WSGI_APPLICATION = 'chalosaathi.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'chalosaathi',
-        'USER': 'root',
-        'PASSWORD': '0000',
-        'HOST': 'localhost',
+        'NAME': os.getenv('DB_NAME', 'chalosaathi_db'),
+        'USER': os.getenv('DB_USER', 'django_user'),
+        'PASSWORD': os.getenv('DB_PASS', 'MyStrongPass123'),
+        'HOST': os.getenv('DB_HOST', 'db'),
         'PORT': '3306',
     }
 }
@@ -143,8 +143,8 @@ EMAIL_HOST_USER = 'no.reply.info.chalosaathi@gmail.com'   # your email
 EMAIL_HOST_PASSWORD = 'mkig oeja xksq snpj'  # use App Password, not normal password
 
 # Celery Configuration
-CELERY_BROKER_URL = 'redis://localhost:6379/0'  # Redis as the broker
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'  # Store task results
+CELERY_BROKER_URL = 'redis://redis_broker:6379/0'
+CELERY_RESULT_BACKEND = 'redis://redis_broker:6379/0'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
