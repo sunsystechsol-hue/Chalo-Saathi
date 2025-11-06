@@ -9,7 +9,7 @@ from django.conf.urls.static import static
 from .views import send_email_view
 
 urlpatterns = [
-    path("index/", views.index, name="index"),
+    path("", views.index, name="index"),
     path("profile/", views.profile, name="profile"),
     path("ride/<int:ride_id>/cancel/", views.cancel_ride, name="cancel_ride"),
     path("ride/<int:ride_id>/resume/", views.resume_ride, name="resume_ride"),

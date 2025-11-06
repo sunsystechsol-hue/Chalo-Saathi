@@ -1,0 +1,1 @@
+sudo apt-get install -y dos2unixfind . -type f -name "*.sh" -exec dos2unix {} \;
