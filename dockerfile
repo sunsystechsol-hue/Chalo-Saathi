@@ -27,8 +27,8 @@ RUN pip install --upgrade pip && pip install -r requirements.txt
 # ✅ Collect static files for Django
 RUN python manage.py collectstatic --noinput || true
 
-# ✅ Expose port (Render uses this to map requests)
+# ✅ Expose port (Render auto-assigns, but 8000 is default locally)
 EXPOSE 8000
 
-# ✅ Start Gunicorn (production WSGI server)
-CMD ["gunicorn", "chalosaathi.wsgi:application", "--bind", "0.0.0.0:8000"]
+# ✅ Start Gunicorn (Render sets $PORT dynamically)
+CMD ["sh", "-c", "gunicorn chalosaathi.wsgi:application --bind 0.0.0.0:$PORT"]
