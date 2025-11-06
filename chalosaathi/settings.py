@@ -9,31 +9,27 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
-from dotenv import load_dotenv
 
-load_dotenv() 
 import os
 from pathlib import Path
+from dotenv import load_dotenv
 
-
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+# Load environment variables
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / '.env')
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
+# =======================
+# Basic Django Settings
+# =======================
+SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-+!44=$d!(!7jyxrx=q&u0f-z1dt28dkd_@^^xx=dy-0q3@p1(8")
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-+!44=$d!(!7jyxrx=q&u0f-z1dt28dkd_@^^xx=dy-0q3@p1(8'
+DEBUG = os.getenv("DEBUG", "False").lower() == "true"
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "*").split(",")
 
-ALLOWED_HOSTS = ['*']
-
-
-# Application definition
-
+# =======================
+# Installed Apps
+# =======================
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -44,6 +40,9 @@ INSTALLED_APPS = [
     'chalosaathiapp',
 ]
 
+# =======================
+# Middleware
+# =======================
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -56,6 +55,9 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'chalosaathi.urls'
 
+# =======================
+# Templates
+# =======================
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -73,84 +75,80 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'chalosaathi.wsgi.application'
 
-
-# Database
-# https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-
+# =======================
+# Database Configuration
+# =======================
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': os.getenv('DB_NAME', 'chalosaathi_db'),
         'USER': os.getenv('DB_USER', 'django_user'),
-        'PASSWORD': os.getenv('DB_PASS', 'MyStrongPass123'),
-        'HOST': os.getenv('DB_HOST', 'db'),
-        'PORT': '3306',
+        'PASSWORD': os.getenv('DB_PASSWORD', 'MyStrongPass123'),
+        'HOST': os.getenv('DB_HOST', 'localhost'),
+        'PORT': os.getenv('DB_PORT', '3306'),
+        'OPTIONS': {'charset': 'utf8mb4'},
     }
 }
 
-
-# Password validation
-# https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
-
+# =======================
+# Password Validation
+# =======================
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',},
 ]
 
-
+# =======================
 # Internationalization
-# https://docs.djangoproject.com/en/5.2/topics/i18n/
-
+# =======================
 LANGUAGE_CODE = 'en-us'
-
-TIME_ZONE = 'UTC'
-
+TIME_ZONE = 'Asia/Kolkata'
 USE_I18N = True
-
 USE_TZ = True
 
+# =======================
+# Static & Media Files
+# =======================
+STATIC_URL = '/static/'
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.2/howto/static-files/
-
-STATIC_URL = 'static/'
-
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "chalosaathiapp/static"),
-]
-# Default primary key field type
-# https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
-
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+if DEBUG:
+    STATICFILES_DIRS = [os.path.join(BASE_DIR, "chalosaathiapp/static")]
+else:
+    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+# =======================
+# Default Primary Key
+# =======================
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# =======================
+# Custom User Model
+# =======================
 AUTH_USER_MODEL = "chalosaathiapp.UserProfile"
 
+# =======================
+# Email Configuration
+# =======================
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'no.reply.info.chalosaathi@gmail.com'   # your email
-EMAIL_HOST_PASSWORD = 'mkig oeja xksq snpj'  # use App Password, not normal password
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', 'no.reply.info.chalosaathi@gmail.com')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', 'mkig oeja xksq snpj')
 
+# =======================
 # Celery Configuration
-CELERY_BROKER_URL = 'redis://redis_broker:6379/0'
-CELERY_RESULT_BACKEND = 'redis://redis_broker:6379/0'
+# =======================
+REDIS_URL = os.getenv("REDIS_URL", "redis://redis_broker:6379/0")
+CELERY_BROKER_URL = REDIS_URL
+CELERY_RESULT_BACKEND = REDIS_URL
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
-CELERY_TIMEZONE = 'Asia/Kolkata'  # Set to IST
-CELERY_TASK_EAGER_PROPAGATES = True  # For debugging in development
-
+CELERY_TIMEZONE = 'Asia/Kolkata'
+CELERY_TASK_EAGER_PROPAGATES = True
