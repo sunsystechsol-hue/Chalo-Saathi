@@ -1,8 +1,9 @@
+# syntax=docker/dockerfile:1
 FROM python:3.12-slim
 
 WORKDIR /app
 
-# ✅ Install all required system dependencies
+# ✅ Install system dependencies for MySQL + Pillow + SSL + Celery
 RUN apt-get update -o Acquire::Retries=3 && \
     apt-get install -y --no-install-recommends \
         build-essential \
@@ -17,16 +18,17 @@ RUN apt-get update -o Acquire::Retries=3 && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# ✅ Copy code into container
+# ✅ Copy code
 COPY . /app
 
 # ✅ Install Python dependencies
 RUN pip install --upgrade pip && pip install -r requirements.txt
 
-# ✅ Make wait_for_db.sh executable
-RUN chmod +x /app/wait_for_db.sh
+# ✅ Collect static files for Django
+RUN python manage.py collectstatic --noinput || true
 
+# ✅ Expose port (Render uses this to map requests)
 EXPOSE 8000
 
-# ✅ Start server after ensuring DB is ready
-CMD ["sh", "-c", "./wait_for_db.sh && python manage.py runserver 0.0.0.0:8000"]
+# ✅ Start Gunicorn (production WSGI server)
+CMD ["gunicorn", "chalosaathi.wsgi:application", "--bind", "0.0.0.0:8000"]
