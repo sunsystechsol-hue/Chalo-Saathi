@@ -31,4 +31,4 @@ RUN python manage.py collectstatic --noinput || true
 EXPOSE 8000
 
 # ✅ Run database migrations automatically before starting Gunicorn
-CMD ["sh", "-c", "python manage.py migrate --noinput && gunicorn chalosaathi.wsgi:application --bind 0.0.0.0:$PORT"]
+CMD ["sh", "-c", "for i in 1 2 3 4 5; do python manage.py migrate --noinput && break || sleep 5; done && gunicorn chalosaathi.wsgi:application --bind 0.0.0.0:$PORT"]
