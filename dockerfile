@@ -24,11 +24,11 @@ COPY . /app
 # ✅ Install Python dependencies
 RUN pip install --upgrade pip && pip install -r requirements.txt
 
-# ✅ Collect static files for Django
+# ✅ Collect static files (ignore errors)
 RUN python manage.py collectstatic --noinput || true
 
-# ✅ Expose port (Render auto-assigns, but 8000 is default locally)
+# ✅ Expose port (Render auto-assigns)
 EXPOSE 8000
 
-# ✅ Start Gunicorn (Render sets $PORT dynamically)
-CMD ["sh", "-c", "gunicorn chalosaathi.wsgi:application --bind 0.0.0.0:$PORT"]
+# ✅ Run database migrations automatically before starting Gunicorn
+CMD ["sh", "-c", "python manage.py migrate --noinput && gunicorn chalosaathi.wsgi:application --bind 0.0.0.0:$PORT"]
