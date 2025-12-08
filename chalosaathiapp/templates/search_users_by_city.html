@@ -1,0 +1,379 @@
+{% extends "admin_base.html" %}
+{% block content %}
+
+<style>
+    /* Subtle background pattern */
+    body {
+        background-color: #f8f9fa;
+        background-image: 
+            radial-gradient(circle at 10% 20%, rgba(97, 126, 234, 0.05) 0%, transparent 20%),
+            radial-gradient(circle at 80% 60%, rgba(247, 158, 27, 0.05) 0%, transparent 30%),
+            radial-gradient(circle at 40% 80%, rgba(34, 197, 94, 0.05) 0%, transparent 20%);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        min-height: 100vh;
+    }
+    
+    /* Main container with card-based layout */
+    .container-fluid {
+        background-color: white;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        padding: 30px;
+        margin-bottom: 30px;
+        transition: box-shadow 0.3s ease;
+    }
+    
+    .container-fluid:hover {
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Enhanced page title */
+    h3 {
+        color: #2c3e50;
+        font-weight: 600;
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #e9ecef;
+        position: relative;
+    }
+    
+    h3:after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 60px;
+        height: 2px;
+        background: linear-gradient(90deg, #3498db, #2ecc71);
+    }
+    
+    /* Enhanced search box with shadow effects */
+    .search-box {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        padding: 25px;
+        border-radius: 12px;
+        margin-bottom: 25px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        border: 1px solid rgba(255,255,255,0.8);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .search-box:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    }
+    
+    /* Enhanced form controls */
+    .form-control {
+        border-radius: 8px;
+        padding: 12px 15px;
+        border: 1px solid #ced4da;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+    }
+    
+    .form-control:focus {
+        border-color: #3498db;
+        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        transform: translateY(-1px);
+    }
+    
+    /* Enhanced button with gradient */
+    .btn-dark {
+        background: linear-gradient(135deg, #343a40 0%, #2c3e50 100%);
+        border: none;
+        border-radius: 8px;
+        padding: 12px 20px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .btn-dark:before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: left 0.5s ease;
+    }
+    
+    .btn-dark:hover {
+        background: linear-gradient(135deg, #2c3e50 0%, #1a252f 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+    }
+    
+    .btn-dark:hover:before {
+        left: 100%;
+    }
+    
+    /* Summary cards grid layout */
+    .summary-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 25px;
+        margin-bottom: 30px;
+    }
+    
+    /* Enhanced summary cards with color-coded gradients */
+    .summary-card {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .summary-card:before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: linear-gradient(90deg, #6c757d, #adb5bd);
+    }
+    
+    .summary-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Color-coded gradients for summary cards */
+    .summary-card:nth-child(1):before {
+        background: linear-gradient(90deg, #6c757d, #adb5bd);
+    }
+    
+    .summary-card:nth-child(2):before {
+        background: linear-gradient(90deg, #ffc107, #ffdb4d);
+    }
+    
+    .summary-card:nth-child(3):before {
+        background: linear-gradient(90deg, #28a745, #5cb85c);
+    }
+    
+    .summary-card:nth-child(4):before {
+        background: linear-gradient(90deg, #dc3545, #f86c6b);
+    }
+    
+    /* Enhanced summary card text */
+    .summary-card p {
+        color: #6c757d;
+        margin-bottom: 15px;
+        font-weight: 500;
+        font-size: 0.95rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .summary-card h2 {
+        margin: 0;
+        font-size: 2.2rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #2c3e50, #3498db);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    /* Enhanced table container */
+    .table-container {
+        overflow-x: auto;
+        border-radius: 12px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        background: white;
+        padding: 25px;
+        transition: box-shadow 0.3s ease;
+    }
+    
+    .table-container:hover {
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    }
+    
+    /* Enhanced table styling */
+    .table {
+        margin-bottom: 0;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+    
+    .table thead th {
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+        border-bottom: 2px solid #e9ecef;
+        padding: 15px 12px;
+        background: linear-gradient(135deg, #343a40 0%, #2c3e50 100%);
+        color: white;
+    }
+    
+    .table tbody tr {
+        transition: all 0.2s ease;
+    }
+    
+    .table tbody tr:hover {
+        background-color: rgba(52, 152, 219, 0.05);
+        transform: scale(1.01);
+    }
+    
+    .table td {
+        vertical-align: middle;
+        padding: 15px 12px;
+        border-bottom: 1px solid #f1f3f5;
+    }
+    
+    /* Enhanced badge styling */
+    .badge {
+        font-size: 0.85rem;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-weight: 500;
+        letter-spacing: 0.3px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        transition: transform 0.2s ease;
+    }
+    
+    .badge:hover {
+        transform: scale(1.1);
+    }
+    
+    /* Enhanced text styling */
+    .text-danger {
+        font-weight: 500;
+        font-size: 1.1rem;
+    }
+    
+    /* Responsive design with improved breakpoints */
+    @media (max-width: 992px) {
+        .summary-cards {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .summary-cards {
+            grid-template-columns: 1fr;
+        }
+        
+        .container-fluid {
+            padding: 20px;
+        }
+        
+        .table-container {
+            padding: 15px;
+        }
+    }
+    
+    /* Loading animation */
+    @keyframes pulse {
+        0% { opacity: 1; }
+        50% { opacity: 0.7; }
+        100% { opacity: 1; }
+    }
+    
+    .loading {
+        animation: pulse 1.5s infinite ease-in-out;
+    }
+</style>
+
+<div class="container-fluid">
+
+    <!-- ✅ PAGE TITLE -->
+    <h3 class="mb-4">Users Search By City</h3>
+
+    <!-- ✅ SEARCH BOX -->
+    <div class="search-box">
+        <form method="get" class="row">
+            <div class="col-md-4">
+                <input type="text" name="city" value="{{ city }}" class="form-control"
+                       placeholder="Enter city name">
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-dark w-100">Search</button>
+            </div>
+        </form>
+    </div>
+
+    {% if city %}
+
+    <!-- ✅ SUMMARY CARDS -->
+    <div class="summary-cards">
+        <div class="summary-card">
+            <p>Total Bookings</p>
+            <h2>{{ summary.total }}</h2>
+        </div>
+
+        <div class="summary-card">
+            <p>Pending</p>
+            <h2>{{ summary.pending }}</h2>
+        </div>
+
+        <div class="summary-card">
+            <p>Confirmed</p>
+            <h2>{{ summary.confirmed }}</h2>
+        </div>
+
+        <div class="summary-card">
+            <p>Canceled</p>
+            <h2>{{ summary.canceled }}</h2>
+        </div>
+    </div>
+
+    <!-- ✅ DATA TABLE -->
+    <div class="table-container">
+        <table class="table table-bordered table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>Passenger ID</th>
+                    <th>Ride ID</th>
+                    <th>Full Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Status</th>
+                    <th>Pickup Location</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for booking in bookings %}
+                <tr>
+                    <td>{{ booking.passenger.id }}</td>
+                    <td>{{ booking.ride.id }}</td>
+                    <td>{{ booking.passenger.full_name }}</td>
+                    <td>{{ booking.passenger.email }}</td>
+                    <td>{{ booking.passenger.phone }}</td>
+                    <td>
+                        <span class="badge 
+                        {% if booking.status == 'confirmed' %} bg-success
+                        {% elif booking.status == 'pending' %} bg-warning
+                        {% else %} bg-danger {% endif %}">
+                            {{ booking.status }}
+                        </span>
+                    </td>
+                    <td>{{ booking.pickup_location }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center text-danger">
+                        No users found for this city
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+
+        </table>
+    </div>
+
+    {% endif %}
+</div>
+
+{% endblock %}

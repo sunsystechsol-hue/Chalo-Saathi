@@ -1,0 +1,13 @@
+<h2>User Details</h2>
+
+<img src="{{ user.avatar.url }}" width="120" height="120">
+
+<p><strong>Name:</strong> {{ user.full_name }}</p>
+<p><strong>Email:</strong> {{ user.email }}</p>
+<p><strong>Phone:</strong> {{ user.phone }}</p>
+<p><strong>Aadhaar:</strong> {{ user.aadhaar }}</p>
+<p><strong>Gender:</strong> {{ user.gender }}</p>
+
+<a href="{% url 'admin_user_edit' user.id %}">Edit</a> |
+<a href="{% url 'admin_user_delete' user.id %}" onclick="return confirm('Delete user?')">Delete</a> |
+<a href="{% url 'admin_user_list' %}">Back</a>

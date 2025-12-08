@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin | Bookings</title>
+    <link rel="stylesheet" href="/static/css/admin.css">
+</head>
+<body>
+
+<div class="login-container" style="width:95%">
+    <h2>All Bookings</h2>
+
+    <!-- ✅ STATUS FILTER -->
+    <form method="GET" style="margin-bottom:20px;">
+        <select name="status">
+            <option value="">All</option>
+            <option value="pending" {% if status_filter == "pending" %}selected{% endif %}>Pending</option>
+            <option value="confirmed" {% if status_filter == "confirmed" %}selected{% endif %}>Confirmed</option>
+            <option value="canceled" {% if status_filter == "canceled" %}selected{% endif %}>Canceled</option>
+        </select>
+        <button type="submit">Filter</button>
+        <a href="{% url 'admin_panel' %}">⬅ Back</a>
+    </form>
+
+    <table border="1" width="100%" cellpadding="8">
+        <tr>
+            <th>#</th>
+            <th>Passenger</th>
+            <th>Ride</th>
+            <th>Status</th>
+            <th>Pickup</th>
+            <th>Contact</th>
+            <th>Message</th>
+            <th>Subscription</th>
+            <th>Time</th>
+        </tr>
+
+        {% for booking in bookings %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ booking.passenger.email }}</td>
+            <td>{{ booking.ride }}</td>
+            <td>{{ booking.status }}</td>
+            <td>{{ booking.pickup_location }}</td>
+            <td>{{ booking.contact_number }}</td>
+            <td>{{ booking.message|default:"-" }}</td>
+            <td>{{ booking.subscription_type|default:"-" }}</td>
+            <td>{{ booking.booking_time }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="9" style="text-align:center;">No bookings found</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
+</body>
+</html>

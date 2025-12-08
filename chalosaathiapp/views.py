@@ -698,3 +698,225 @@ def choose_subscription(request, booking_id):
         'monthly_cost': round(monthly_cost, 2),
         'quarterly_cost': round(quarterly_cost, 2),
     })
+
+
+
+# admin
+
+
+
+from django.db.models import Q
+
+
+#--------------------------------
+def admin_login(request):
+    return render(request,'admin-login.html')
+
+
+def admin_panel(request):
+    """
+    Fetches summary statistics and recent users for the admin dashboard.
+    """
+    # --- Calculate Summary Stats (from previous step) ---
+    total_users = UserProfile.objects.count()
+    total_bookings = Booking.objects.count()
+    total_rides = Ride.objects.count()
+    pending_bookings = Booking.objects.filter(status='pending').count()
+    
+    # --- NEW: Fetch Recent Users ---
+    # Get the 5 most recently joined users
+    recent_users = UserProfile.objects.order_by('-date_joined')[:5]
+    
+    # --- Prepare the context dictionary ---
+    # Add the recent_users to the context
+    context = {
+        'total_users': total_users,
+        'total_bookings': total_bookings,
+        'total_rides': total_rides,
+        'pending_bookings': pending_bookings,
+        'recent_users': recent_users, # Pass the new data to the template
+    }
+
+    # --- Render the template with the context ---
+    return render(request, 'admin-panel.html', context)
+
+
+# views.py
+from django.shortcuts import render, get_object_or_404, redirect
+from .models import UserProfile
+from django.db.models import Q
+
+def admin_user_list(request):
+    search = request.GET.get("search")
+    gender = request.GET.get("gender")
+
+    users = UserProfile.objects.all()
+
+    if search:
+        users = users.filter(
+            Q(full_name__icontains=search) |
+            Q(email__icontains=search) |
+            Q(phone__icontains=search)
+        )
+
+    if gender and gender != "All":
+        users = users.filter(gender=gender)
+
+    context = {
+        "users": users,
+        "search": search,
+        "gender": gender,
+    }
+    return render(request, "users_list.html", context)
+
+
+def admin_user_detail(request, user_id):
+    user = get_object_or_404(UserProfile, id=user_id)
+    return render(request, "user_detail.html", {"user": user})
+
+
+def admin_user_edit(request, user_id):
+    user = get_object_or_404(UserProfile, id=user_id)
+
+    if request.method == "POST":
+        user.full_name = request.POST.get("full_name")
+        user.phone = request.POST.get("phone")
+        user.aadhaar = request.POST.get("aadhaar")
+        user.gender = request.POST.get("gender")
+
+        if request.FILES.get("avatar"):
+            user.avatar = request.FILES["avatar"]
+
+        user.save()
+        return redirect("admin_user_detail", user_id=user.id)
+
+    return render(request, "user_edit.html", {"user": user})
+
+
+def admin_user_delete(request, user_id):
+    user = get_object_or_404(UserProfile, id=user_id)
+    user.delete()
+    return redirect("admin_user_list")
+
+
+from django.shortcuts import render
+from .models import Booking
+
+def search_users_by_city(request):
+    city = request.GET.get("city", "")
+    bookings = []
+    summary = {}
+
+    if city:
+        bookings = Booking.objects.select_related("passenger", "ride").filter(
+            pickup_location__icontains=city
+        )
+
+        # 🔹 Visual Summary (Status Count)
+        summary = {
+            "total": bookings.count(),
+            "pending": bookings.filter(status="pending").count(),
+            "confirmed": bookings.filter(status="confirmed").count(),
+            "canceled": bookings.filter(status="canceled").count(),
+        }
+
+    context = {
+        "bookings": bookings,
+        "city": city,
+        "summary": summary,
+    }
+
+    return render(request, "search_users_by_city.html", context)
+
+from .models import AdminUser
+from django.contrib.auth.hashers import check_password
+def admin_login(request):
+    if request.method == "POST":
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+
+        try:
+            admin = AdminUser.objects.get(username=username)
+
+            # ✅ SECURE PASSWORD CHECK
+            if check_password(password, admin.password):
+                request.session['admin_id'] = admin.id
+                return redirect('admin_panel')
+            else:
+                messages.error(request, "Invalid username or password")
+
+        except AdminUser.DoesNotExist:
+            messages.error(request, "Invalid username or password")
+
+    return render(request, "admin-login.html")
+
+def admin_logout(request):
+    request.session.flush()
+    return redirect('admin_login')
+
+def add_admin(request):
+    # ✅ Only logged-in admin can access
+    if not request.session.get('admin_id'):
+        return redirect('admin_login')
+
+    if request.method == "POST":
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+        confirm_password = request.POST.get("confirm_password")
+
+        if password != confirm_password:
+            messages.error(request, "Passwords do not match")
+            return redirect('add_admin')
+
+        if AdminUser.objects.filter(username=username).exists():
+            messages.error(request, "Username already exists")
+            return redirect('add_admin')
+
+        AdminUser.objects.create(
+            username=username,
+            password=make_password(password)
+        )
+
+        messages.success(request, "New admin added successfully ✅")
+        return redirect('add_admin')
+
+    return render(request, "add-admin.html")
+
+def admin_view_bookings(request):
+    # ✅ Only logged-in admin can access
+    if not request.session.get('admin_id'):
+        return redirect('admin_login')
+
+    status_filter = request.GET.get('status')
+
+    if status_filter:
+        bookings = Booking.objects.filter(status=status_filter).order_by('-booking_time')
+    else:
+        bookings = Booking.objects.all().order_by('-booking_time')
+
+    return render(request, "admin-bookings.html", {
+        "bookings": bookings,
+        "status_filter": status_filter
+    })
+
+def admin_view_feedback(request):
+    # ✅ Only logged-in admin can access
+    if not request.session.get('admin_id'):
+        return redirect('admin_login')
+
+    feedbacks = Feedback.objects.all().order_by('-created_at')
+
+    return render(request, "admin-feedback.html", {
+        "feedbacks": feedbacks
+    })
+
+
+def delete_feedback(request, id):
+    # ✅ Only logged-in admin can delete
+    if not request.session.get('admin_id'):
+        return redirect('admin_login')
+
+    feedback = get_object_or_404(Feedback, id=id)
+    feedback.delete()
+
+    return redirect('admin_view_feedback')

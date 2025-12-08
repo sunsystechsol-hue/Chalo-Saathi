@@ -37,6 +37,8 @@ urlpatterns = [
     path('choose-subscription/<int:booking_id>/', views.choose_subscription, name='choose_subscription'),
     
     
+    
+    
 ]
     
 

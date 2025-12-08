@@ -395,6 +395,7 @@
                 </div>
                 
                 {% if booking.status == 'pending' %}
+                <a href="{% url 'confirm_booking' booking.id %}" class="btn btn-confirm" onclick="return confirm('Confirm this booking?')">Confirm</a>
                 <a href="{% url 'cancel_booking_driver' booking.id %}" class="btn btn-danger">
                     <i class="fas fa-times-circle"></i> Cancel Booking
                 </a>
