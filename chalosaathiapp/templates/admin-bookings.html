@@ -2,7 +2,170 @@
 <html>
 <head>
     <title>Admin | Bookings</title>
-    <link rel="stylesheet" href="/static/css/admin.css">
+    <!-- You can remove this line if you are using the inline style block below -->
+    <!-- <link rel="stylesheet" href="/static/css/admin.css"> -->
+    
+    <!-- CSS STYLING START -->
+    <style>
+        /* General Body and Container Styles */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .login-container {
+            max-width: 1400px;
+            margin: 20px auto;
+            padding: 25px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        h2 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            color: #2c3e50;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 10px;
+        }
+
+        /* Form and Filter Styles */
+        form {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        form select, form button {
+            padding: 10px 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        form button {
+            background-color: #3498db;
+            color: white;
+            border-color: #3498db;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        form button:hover {
+            background-color: #2980b9;
+        }
+
+        form a {
+            text-decoration: none;
+            color: #555;
+            padding: 10px 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+
+        form a:hover {
+            background-color: #ecf0f1;
+            color: #333;
+        }
+
+        /* Table Styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 0.95rem;
+        }
+
+        table th, table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+            vertical-align: top;
+        }
+
+        table th {
+            background-color: #34495e;
+            color: #ffffff;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+
+        table tbody tr:nth-of-type(even) {
+            background-color: #f8f9fa;
+        }
+
+        table tbody tr:hover {
+            background-color: #e8f4f8;
+        }
+
+        table tbody tr td[colspan="9"] {
+            text-align: center;
+            font-style: italic;
+            color: #777;
+        }
+
+        /* Responsive Design for smaller screens */
+        @media screen and (max-width: 768px) {
+            .login-container {
+                padding: 15px;
+            }
+            table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+            thead, tbody, th, td, tr {
+                display: block;
+            }
+            thead tr {
+                position: absolute;
+                top: -9999px;
+                left: -9999px;
+            }
+            tr {
+                border: 1px solid #ccc;
+                margin-bottom: 10px;
+            }
+            td {
+                border: none;
+                border-bottom: 1px solid #eee;
+                position: relative;
+                padding-left: 50%;
+                white-space: normal;
+                text-align: left;
+            }
+            td:before {
+                position: absolute;
+                top: 12px;
+                left: 15px;
+                width: 45%;
+                padding-right: 10px;
+                white-space: nowrap;
+                text-align: left;
+                font-weight: bold;
+                color: #333;
+            }
+            td:nth-of-type(1):before { content: "ID"; }
+            td:nth-of-type(2):before { content: "Passenger"; }
+            td:nth-of-type(3):before { content: "Ride"; }
+            td:nth-of-type(4):before { content: "Status"; }
+            td:nth-of-type(5):before { content: "Pickup"; }
+            td:nth-of-type(6):before { content: "Contact"; }
+            td:nth-of-type(7):before { content: "Message"; }
+            td:nth-of-type(8):before { content: "Subscription"; }
+            td:nth-of-type(9):before { content: "Time"; }
+        }
+    </style>
+    <!-- CSS STYLING END -->
 </head>
 <body>
 
