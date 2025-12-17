@@ -76,11 +76,19 @@ WSGI_APPLICATION = 'chalosaathi.wsgi.application'
 
 DATABASES = {
     'default': {
+<<<<<<< HEAD
         'ENGINE': 'django.db.backends.mysql',
         'NAME': os.getenv('DB_NAME', 'chalosaathi_db'),
         'USER': os.getenv('DB_USER', 'django_user'),
         'PASSWORD': os.getenv('DB_PASS', 'MyStrongPass123'),
         'HOST': os.getenv('DB_HOST', 'db'),
+=======
+        'ENGINE': 'mysql.connector.django',
+        'NAME': 'chalosaathi',
+        'USER': 'root',
+        'PASSWORD': '0000',
+        'HOST': 'localhost',
+>>>>>>> 2d4290d (change database engine)
         'PORT': '3306',
     }
 }
